@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('risk_managements', function (Blueprint $table) {
             $table->id();
-            $table->string('process name');
+            $table->string('process_name');
             $table->timestamps();
         });
     }

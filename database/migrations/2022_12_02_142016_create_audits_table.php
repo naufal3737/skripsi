@@ -13,10 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('questions', function (Blueprint $table) {
-            $table->unsignedBigInteger('level');
+        Schema::create('audits', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('progress');
+            $table->timestamps();
 
-            $table->foreign('level')->references('id')->on('levels');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
@@ -27,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('questions', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('audits');
     }
 };

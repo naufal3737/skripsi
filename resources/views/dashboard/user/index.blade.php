@@ -20,14 +20,14 @@
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">No</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-4">User</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Role</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-2">Action</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-2 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                     @foreach ($users as $user)
                     <tr>
                         <td>
-                          <p class="text-xs font-weight-bold mb-0 text-center">{{$loop->iteration}}</p>
+                          <p class="text-xs font-weight-bold mb-0 text-center">{{$users->firstItem() + $loop->index}}</p>
                         </td>
                       <td>
                         <div class="d-flex px-2 py-1">
@@ -43,11 +43,11 @@
                       <td>
                         <p class="text-xs font-weight-bold mb-0">{{Str::ucfirst($user->roles->pluck('name')[0])}}</p>
                       </td>
-                      <td class="align-middle">
+                      <td class="text-center">
                             <form action="{{route('dashboard.user.destroy',$user)}}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-link text-danger text-gradient px-3 mb-0" onclick="return confirm('Are you sure want to delete this user?')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
+                                <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Are you sure want to delete this user?')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
                             </form>
                       </td>
                     </tr>

@@ -13,19 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('questions', function (Blueprint $table) {
+        Schema::create('failed_questions', function (Blueprint $table) {
             $table->id();
-            $table->string('question');
-            $table->string('recomendation');
-            $table->unsignedBigInteger('risk_management_id');
-            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('question_id');
+            $table->unsignedBigInteger('audit_id');
             $table->unsignedBigInteger('level_id');
             $table->timestamps();
 
-            $table->foreign('risk_management_id')->references('id')->on('risk_managements');
+            $table->foreign('question_id')->references('id')->on('questions');
+            $table->foreign('audit_id')->references('id')->on('audits');
             $table->foreign('level_id')->references('id')->on('levels');
-            $table->foreign('category_id')->references('id')->on('categories');
-
         });
     }
 
@@ -36,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('questions');
+        Schema::dropIfExists('question_values');
     }
 };

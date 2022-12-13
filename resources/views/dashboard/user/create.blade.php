@@ -14,8 +14,8 @@
                 <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto">
                   <div class="card card-plain">
                     <div class="card-header">
-                      <h4 class="font-weight-bolder">Register</h4>
-                      <p class="mb-0">Enter your email and password to register</p>
+                      <h4 class="font-weight-bolder">Add New User</h4>
+                      <p class="mb-0">Please fill these form correctly</p>
                     </div>
                     <div class="card-body" style="background: #FFFFFF">
                       <form role="form" action="{{ route('dashboard.user.store') }}" method="POST">
@@ -76,15 +76,9 @@
                           </label>
                         </div> --}}
                         <div class="text-center">
-                          <button type="submit" class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">Register</button>
+                          <button type="submit" class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0">Add New User</button>
                         </div>
                       </form>
-                    </div>
-                    <div class="card-footer text-center pt-0 px-lg-2 px-1">
-                      <p class="mb-2 text-sm mx-auto">
-                        Already have an account?
-                        <a href="login" class="text-primary text-gradient font-weight-bold">Login</a>
-                      </p>
                     </div>
                   </div>
                 </div>

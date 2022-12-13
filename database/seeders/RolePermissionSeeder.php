@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -17,9 +18,13 @@ class RolePermissionSeeder extends Seeder
      */
     public function run()
     {
-        $admin = User::find(3);
-        $auditor = User::find(5);
-        $user = User::find(6);
+        $admin = User::create(
+            [
+                'name' => 'admin',
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('admin123'),
+            ]
+        );
 
         $role_admin = Role::create(['name' => 'admin']);
         $role_auditor = Role::create(['name' => 'auditor']);
@@ -33,9 +38,7 @@ class RolePermissionSeeder extends Seeder
         $role_auditor->givePermissionTo('validate');
         $role_user->givePermissionTo('use audit');
 
-        $user->assignRole('user');
         $admin->assignRole('admin');
-        $auditor->assignRole('auditor');
 
     }
 }
