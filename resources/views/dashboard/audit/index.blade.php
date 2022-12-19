@@ -18,9 +18,10 @@
                 <thead>
                   <tr>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">No</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-4">Audit</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-2">Action</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-2">Audit</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-3">Status</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Lanjut</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -41,13 +42,28 @@
                         </div>
                       </td>
                       <td>
-                        @if ($audit->validated == 'true')
-                        <p class="text-xs font-weight-bold mb-0">Dapat Melanjutkan Level</p>
+                        @if ($audit->progress == 'end')
+                            <p class="text-xs font-weight-bold mb-0">Audit telah selesai</p>
                         @else
-                        <p class="text-xs font-weight-bold mb-0">Menunggu Validasi</p>
+                            @if ($audit->validated == 'true')
+                            <p class="text-xs font-weight-bold mb-0">Dapat melanjutkan level</p>
+                            @else
+                            <p class="text-xs font-weight-bold mb-0">Menunggu validasi</p>
+                            @endif
                         @endif
                       </td>
-                      <td class="align-middle">
+                      <td class="text-center">
+                        @if ($audit->progress == 'end')
+                            <a class="btn btn-info text-info text-gradient px-3 mb-0"" href="{{route('dashboard.audit.output', $audit->id)}}"><i class="material-icons text-sm me-2">reviews</i>Lihat Hasil</a>
+                        @else
+                            @if ($audit->validated == 'true')
+                                <a class="btn btn-success text-success text-gradient px-3 mb-0"" href="{{route('dashboard.audit.level2')}}"><i class="material-icons text-sm me-2">check</i>Lanjut</a>
+                            @else
+                            <button class="btn btn-danger text-danger text-gradient px-3 mb-0" disabled><i class="material-icons text-sm me-2">close</i>Menunggu Validasi</button>
+                            @endif
+                        @endif
+                      </td>
+                      <td class="text-center">
                             <form action="{{route('dashboard.audit.destroy',$audit)}}" method="POST">
                                 @csrf
                                 @method('DELETE')

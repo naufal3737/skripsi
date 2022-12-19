@@ -8,11 +8,11 @@
     </div>
     <div class="card card-body mx-3 mx-md-4 mt-n6">
         <h3 class="mb-4 text-secondary">Kuisioner Tata Kelola</h3>
-        <span class="text-center text-xs font-weight-bold pb-2">Progress - Level 1</span>
+        <span class="text-center text-xs font-weight-bold pb-2">Progress - Level 2</span>
         <div class="align-items-center justify-content-center my-3">
             <div>
               <div class="progress">
-                <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 40%;"></div>
               </div>
             </div>
         </div>

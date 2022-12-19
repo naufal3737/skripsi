@@ -66,6 +66,10 @@ class AuditController extends Controller
         $sortedData = $this->sortData($validatedData, $audit);
         //
 
+        //Check if audit pass level
+
+        //
+
         //Store counted answer
         $create = Calculation::create([
             'penetapan_konteks' => $this->countRightAnswer($sortedData->penetapan_konteks),
@@ -87,7 +91,8 @@ class AuditController extends Controller
 
     public function level2()
     {
-        return view('dashboard.audit.level2');
+        $questions = Question::where('level_id', 2)->get();
+        return view('dashboard.audit.level2', ['questions' => $questions]);
     }
 
     public function level3()
@@ -136,8 +141,17 @@ class AuditController extends Controller
 
     public function countRightAnswer(object $object )
     {
-        $percent = 100;
-        $result =  (count(array_keys(get_object_vars($object), 'true')) / count(get_object_vars($object))) * $percent;
+        $toPercent = 100;
+        $rightAnswer = count(array_keys(get_object_vars($object), 'true')) ;
+        $totalQuestion = count(get_object_vars($object));
+
+        $result =  ($rightAnswer / $totalQuestion) * $toPercent;
         return $result;
+    }
+
+    public function output($id)
+    {
+        $outputs = Audit::find($id);
+        return view('dashboard.audit.output');
     }
 }

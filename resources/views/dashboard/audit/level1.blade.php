@@ -12,7 +12,7 @@
         <div class="align-items-center justify-content-center my-3">
             <div>
               <div class="progress">
-                <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 20%;"></div>
+                <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%;"></div>
               </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                     <div class="form-group">
                       <label class="form-label">{{$loop->iteration.'. '  .$question->question}}</label>
                         <div class="form-check">
-                          <input class="form-check-input @error(strtolower($question->risk_management->process_name).'-'.$question->id) is-invalid @enderror" type="radio" name="{{strtolower($question->risk_management->process_name)}}-{{$question->id}}" id="answerYes" value="true" checked>
+                          <input class="form-check-input @error(strtolower($question->risk_management->process_name).'-'.$question->id) is-invalid @enderror" type="radio" name="{{strtolower($question->risk_management->process_name)}}-{{$question->id}}" id="answerYes" value="true">
                           <label class="form-check-label" for="answerYes">
                             Ya
                           </label>

@@ -39,6 +39,7 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     Route::get('/audit/level-5', [AuditController::class, 'level5'])->name('audit.level5');
     Route::post('/audit/level-5/store', [AuditController::class, 'storeLevel5'])->name('audit.level5.store');
     Route::delete('/audit/{audit}', [AuditController::class, 'destroy'])->name('audit.destroy');
+    Route::get('/audit/output/{audit}', [AuditController::class, 'output'])->name('audit.output');
 
     Route::get('/user-management', [UserController::class, 'index'])->name('user.management');
     Route::get('/user-management/create', [UserController::class, 'create'])->name('user.create');
@@ -49,5 +50,6 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     Route::get('/validate-file', [ValidateFileController::class, 'index'])->name('validate');
     Route::post('/validate-file/validateFile/{audit}', [ValidateFileController::class, 'validateFile'])->name('validate.validateFile');
     Route::post('/validate-file/unvalidateFile/{audit}', [ValidateFileController::class, 'unvalidateFile'])->name('validate.unvalidateFile');
+
 });
 
