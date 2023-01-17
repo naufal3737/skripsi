@@ -13,6 +13,16 @@ class Audit extends Model
         'progress',
         'user_id',
         'validated',
+        'passedProcess',
+        'files',
+        'level',
+    ];
+
+    protected $casts = [
+        'validated' => 'boolean',
+        'passedProcess' => 'array',
+        'files' => 'array',
+        'level' => 'integer',
     ];
 
     public function user(){

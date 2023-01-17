@@ -27,9 +27,14 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     Route::get('/file-validation', [DashboardController::class, 'fileValidationIndex'])->name('file.validate');
     // Route::get('/audit', [DashboardController::class, 'auditIndex'])->name('audit');
 
+
     Route::get('/audit', [AuditController::class, 'index'])->name('audit');
     Route::get('/audit/level-1', [AuditController::class, 'level1'])->name('audit.level1');
     Route::post('/audit/level-1/store', [AuditController::class, 'storeLevel1'])->name('audit.level1.store');
+    // Route::get('/audit/{audit}/create', [AuditController::class, 'createFile'])->name('audit.file.create');
+    // Route::post('/audit/put', [AuditController::class, 'putFile'])->name('audit.file.put');
+    // Route::post('/audit/level-1/file', [AuditController::class, 'fileLevel1'])->name('audit.file1');
+    // Route::post('/audit/level-1/file/store', [AuditController::class, 'storeFileLevel1'])->name('audit.file11.store');
     Route::get('/audit/level-2', [AuditController::class, 'level2'])->name('audit.level2');
     Route::post('/audit/level-2/store', [AuditController::class, 'storeLevel2'])->name('audit.level2.store');
     Route::get('/audit/level-3', [AuditController::class, 'level3'])->name('audit.level3');
@@ -38,6 +43,7 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     Route::post('/audit/level-4/store', [AuditController::class, 'storeLevel4'])->name('audit.level4.store');
     Route::get('/audit/level-5', [AuditController::class, 'level5'])->name('audit.level5');
     Route::post('/audit/level-5/store', [AuditController::class, 'storeLevel5'])->name('audit.level5.store');
+
     Route::delete('/audit/{audit}', [AuditController::class, 'destroy'])->name('audit.destroy');
     Route::get('/audit/output/{audit}', [AuditController::class, 'output'])->name('audit.output');
 
@@ -48,8 +54,9 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     // Route::resource('/user-management', UserController::class, ['as'=>'user']);
 
     Route::get('/validate-file', [ValidateFileController::class, 'index'])->name('validate');
+    Route::get('/validate-file/{audit}/view', [ValidateFileController::class, 'showFile'])->name('validate.file');
+    Route::get('/validate-file/{audit}/view/{file}', [ValidateFileController::class, 'viewFile'])->name('validate.file.view');
     Route::post('/validate-file/validateFile/{audit}', [ValidateFileController::class, 'validateFile'])->name('validate.validateFile');
     Route::post('/validate-file/unvalidateFile/{audit}', [ValidateFileController::class, 'unvalidateFile'])->name('validate.unvalidateFile');
-
 });
 

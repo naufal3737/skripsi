@@ -44,17 +44,20 @@
                         <form action="{{route('dashboard.validate.unvalidateFile',$audit)}}" method="POST">
                             @csrf
                             @method('POST')
-                            <button class="btn btn-success text-success text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk menghapus validasi terhadap audit ini?')"><i class="material-icons text-sm me-2">check</i>Tervalidasi</button>
+                            <button class="btn btn-success text-success text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk menghapus validasi terhadap audit ini?')" {{$audit->progress == 'end' ? 'disabled' : ''}}><i class="material-icons text-sm me-2">check</i>{{$audit->progress == 'end' ? 'Audit telah selesai' : 'Tervalidasi'}}</button>
                         </form>
                         @else
                         <form action="{{route('dashboard.validate.validateFile',$audit)}}" method="POST">
                             @csrf
                             @method('POST')
-                            <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk memvalidasi audit ini? \nPastikan bahwa audit ini sesuai dengan berkas yang telah diberikan.')"><i class="material-icons text-sm me-2">close</i>Belum Tervalidasi</button>
+                            <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk memvalidasi audit ini? \nPastikan bahwa audit ini sesuai dengan berkas yang telah diberikan.')" {{$audit->progress == 'end' ? 'disabled' : ''}}><i class="material-icons text-sm me-2">close</i>{{$audit->progress == 'end' ? 'Audit telah selesai' : 'Belum tervalidasi'}}</button>
                         </form>
                         @endif
                       </td>
                       <td class="text-center">
+                        @if ($audit->files)
+                        <a class="btn btn-info text-info text-gradient" href="{{route('dashboard.validate.file', $audit)}}"><i class="material-icons text-sm me-2">description</i>Lihat Berkas</a>
+                        @endif
                             <form action="{{route('dashboard.audit.destroy',$audit)}}" method="POST">
                                 @csrf
                                 @method('DELETE')

@@ -20,7 +20,7 @@
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">No</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-2">Audit</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-3">Status</th>
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Lanjut</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Progress</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Action</th>
                   </tr>
                 </thead>
@@ -54,7 +54,7 @@
                       </td>
                       <td class="text-center">
                         @if ($audit->progress == 'end')
-                            <a class="btn btn-info text-info text-gradient px-3 mb-0"" href="{{route('dashboard.audit.output', $audit->id)}}"><i class="material-icons text-sm me-2">reviews</i>Lihat Hasil</a>
+                            <a class="btn btn-info text-info text-gradient px-3 mb-0"" href="{{route('dashboard.audit.output', $audit)}}"><i class="material-icons text-sm me-2">reviews</i>Lihat Hasil</a>
                         @else
                             @if ($audit->validated == 'true')
                                 <a class="btn btn-success text-success text-gradient px-3 mb-0"" href="{{route('dashboard.audit.level2')}}"><i class="material-icons text-sm me-2">check</i>Lanjut</a>
@@ -67,7 +67,7 @@
                             <form action="{{route('dashboard.audit.destroy',$audit)}}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk menghapus audit ini? \nAudit yang dihapus tidak akan dapat dikembalikan dan akan kehilangan semua progress.')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
+                                <button class="btn btn-danger text-danger text-gradient mb-0" onclick="return confirm('Apakah yakin untuk menghapus audit ini? \nAudit yang dihapus tidak akan dapat dikembalikan dan akan kehilangan semua progress.')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
                             </form>
                       </td>
                     </tr>

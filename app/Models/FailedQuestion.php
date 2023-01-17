@@ -14,4 +14,8 @@ class FailedQuestion extends Model
         'level_id',
         'audit_id'
     ];
+
+    public function question(){
+        return $this->belongsTo(Question::class, 'question_id', 'id');
+    }
 }
