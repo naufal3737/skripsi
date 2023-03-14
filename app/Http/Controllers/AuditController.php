@@ -7,6 +7,7 @@ use App\Models\Calculation;
 use App\Models\FailedQuestion;
 use App\Models\Question;
 use App\Models\RiskManagement;
+use App\Traits\CalculateAndSort;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +15,11 @@ use Illuminate\Support\Facades\File;
 
 class AuditController extends Controller
 {
+    use CalculateAndSort;
+
     public function __construct()
     {
-        $this->middleware('can:use audit')->except('viewFile');
+        $this->middleware('can:use audit');
     }
 
     public function index()
@@ -47,15 +50,26 @@ class AuditController extends Controller
 
     public function level1()
     {
-        $questions = Question::where('level_id', 1)->get();
+        $questions = Question::where('level', 1)->get();
         return view('dashboard.audit.level1', ['questions' => $questions]);
     }
 
-    public function storeLevel1(Request $request)
+    public function store(Request $request)
 
     {
+        // dd($request);
+        // dd($request);
+        $audit = Audit::find($request->id);
         //Validation
-        $questions = Question::where('level_id', '1')->where('id', '!=', '9')->get();
+
+        if(!$audit){
+            $questions = Question::where('level', '1')->where('id', '!=', '9')->get();
+        } else {
+            $questionLevel = $audit->level + 1;
+            $questions = Question::where('level', $questionLevel)->where('id', '!=', '9')->whereIn('risk_management_id', $request->questionIdArr)->get();
+        }
+
+
 
         // $rules = [
         //     'filenames' => 'required',
@@ -67,20 +81,40 @@ class AuditController extends Controller
         foreach ($questionArray as $value){
             $rules[$value] = 'required';
         }
+        // dd($rules);
         $validatedData = $request->validate($rules);
-
+        // dd($validatedData);
 
         //Create new Audit
-        //$level = $request->level;
-        $level = 1;
-        $audit = Audit::create([
-            'user_id' => Auth::user()->id
-        ]);
 
+
+        if (!$audit){
+            $audit = Audit::create([
+                'user_id' => Auth::user()->id,
+                'progress' => 'ongoing'
+            ]);
+        }
+        $audit->validated = false;
+
+
+        if ($audit->level == null){
+            $level = 1;
+        }
+        // if($audit->level == null){
+        //     $level = 1;
+        // }elseif($audit->level < 5){
+        //     $level = $audit->level + 1;
+        // }else {
+        //     $level = $audit->level;
+        // }
 
         //Sort data
         $sortedData = $this->sortData($validatedData, $audit, $level);
 
+        //Raw data insert
+        $raw_data_object = (object)[];
+        $raw_data_object->{'level_'.$level} = $validatedData;
+        $audit->raw_data = $raw_data_object;
 
         //Store file
         $pathArr = [];
@@ -95,7 +129,9 @@ class AuditController extends Controller
         }
         $audit->files = $pathArr;
 
+
         //Store answer
+        // dd($sortedData);
         $create = Calculation::create([
             'penetapan_konteks' => $this->countRightAnswer($sortedData->penetapan_konteks),
             'identifikasi_risiko' => $this->countRightAnswer($sortedData->identifikasi_risiko),
@@ -105,23 +141,30 @@ class AuditController extends Controller
             'mitigasi_risiko' => $this->countRightAnswer($sortedData->mitigasi_risiko),
             'pemantauan_risiko' => $this->countRightAnswer($sortedData->pemantauan_risiko),
             'evaluasi_risiko' => $this->countRightAnswer($sortedData->evaluasi_risiko),
-            'level_id' => $level,
+            'level' => $level,
             'audit_id' => $audit->id
             ]) ;
 
         //Check if audit pass level
         $processCollection = collect($create);
-        $filteredProcess = $processCollection->except(['level_id', 'audit_id', 'created_at', 'updated_at', 'id']);
+        $filteredProcess = $processCollection->except(['level', 'audit_id', 'created_at', 'updated_at', 'id']);
 
-        $limit = 50;
+        if($audit->level < 2){
+            $limit = 50;
+        }elseif ($audit->level < 5) {
+            $limit = 100;
+        }else {
+            $limit = 100;
+            $audit->progress = 'end';
+        }
+
         $passedProcess = $this->passedProcess($audit, $filteredProcess, $limit, $level);
 
         if (empty($passedProcess[$level])){
             $audit->progress = 'end';
-            $audit->level = 0;
         } else {
             $audit->progress = 'ongoing';
-            $audit->level = 1;
+            ++$audit->level ;
         }
         $audit->passed_process = $passedProcess;
         $audit->save();
@@ -130,103 +173,159 @@ class AuditController extends Controller
         return redirect('/dashboard/audit/')->with('success', 'Audit berhasil dibuat, silahkan menunggu validasi untuk melanjutkan.');
     }
 
-    public function level2()
+    public function level2(Audit $audit)
     {
-
-        $questions = Question::where('level_id', 2)->get();
-        return view('dashboard.audit.level2', ['questions' => $questions]);
-    }
-
-    public function level3()
-    {
-        return view('dashboard.audit.level3');
-    }
-
-    public function level4()
-    {
-        return view('dashboard.audit.level4');
-    }
-
-    public function level5()
-    {
-        return view('dashboard.audit.level5');
-    }
-
-    public function passedProcess( $audit, object $process, int $limit , int $level)
-    {
-        $currentPassedProcess = $audit->passed_process;
-        $baseProcess = [];
-        $passedProcess = [];
-        foreach ($process as $key=>$value){
-            if (empty($currentPassedProcess)){
-                $baseProcess[] = $key;
-            }
-            if ($value >= $limit){
-                $passedProcess[] = $key;
-            }
+        $passedProcessArr = $audit->passed_process;
+        $passedLevelProcess = $passedProcessArr[1];
+        foreach ($passedLevelProcess as $process){
+            $formattedProcess = ucwords(str_replace('_', ' ', $process));
+            $processId = RiskManagement::where('process_name', $formattedProcess)->pluck('id');
+            $formattedArr[] = $processId[0];
         }
 
-        if (!empty($baseProcess)){
-            $currentPassedProcess[0] = $baseProcess;
-        }
+        $questions = Question::where('level', 2)->whereIn('risk_management_id', $formattedArr)->get();
 
-        $currentPassedProcess[$level] = $passedProcess;
-        $prevLevel = $level - 1;
-        $prevArr = $currentPassedProcess[$prevLevel];
 
-        foreach ($currentPassedProcess[$level] as $currItem) {
-            $key = array_search($currItem, $prevArr);
-            if ($currItem = $prevArr[$key]){
-                unset($prevArr[$key]);
-
-            }
-        }
-        $newArr = array_values($prevArr);
-        $currentPassedProcess[$prevLevel] = $newArr;
-
-        return $currentPassedProcess;
+        return view('dashboard.audit.level2', ['questions' => $questions, 'audit' => $audit, 'process_id' => $formattedArr]);
     }
 
-    public function sortData(array $validatedData, object $audit, int $level)
+    public function level3(Audit $audit)
     {
-        //Sorting Data
-        $sortedData = (object)[];
-        foreach ($validatedData as $key=>$value){
-            list($risk_management, $questionId) = explode('-', $key);
-
-            if(!isset($sortedData->$risk_management)){
-                $sortedData->$risk_management = (object)[];
-            }
-
-            if($value == 'false'){
-                FailedQuestion::create([
-                    'question_id' => $questionId,
-                    'audit_id' => $audit->id,
-                    'level_id' => $level,
-
-                ]);
-            }
-
-            $sortedData->$risk_management->$questionId = $value;
+        $passedProcessArr = $audit->passed_process;
+        $passedLevelProcess = $passedProcessArr[2];
+        foreach ($passedLevelProcess as $process){
+            $formattedProcess = ucwords(str_replace('_', ' ', $process));
+            $processId = RiskManagement::where('process_name', $formattedProcess)->pluck('id');
+            $formattedArr[] = $processId[0];
         }
-        return $sortedData;
+
+        $questions = Question::where('level', 3)->whereIn('risk_management_id', $formattedArr)->get();
+
+
+        return view('dashboard.audit.level3', ['questions' => $questions, 'audit' => $audit, 'process_id' => $formattedArr]);
     }
 
-    public function countRightAnswer(object $object )
+    public function level4(Audit $audit)
     {
-        $toPercent = 100;
-        $rightAnswer = count(array_keys(get_object_vars($object), 'true')) ;
-        $totalQuestion = count(get_object_vars($object));
+        $passedProcessArr = $audit->passed_process;
+        $passedLevelProcess = $passedProcessArr[3];
+        foreach ($passedLevelProcess as $process){
+            $formattedProcess = ucwords(str_replace('_', ' ', $process));
+            $processId = RiskManagement::where('process_name', $formattedProcess)->pluck('id');
+            $formattedArr[] = $processId[0];
+        }
 
-        $result =  ($rightAnswer / $totalQuestion) * $toPercent;
-        return $result;
+        $questions = Question::where('level', 4)->whereIn('risk_management_id', $formattedArr)->get();
+
+
+        return view('dashboard.audit.level4', ['questions' => $questions, 'audit' => $audit, 'process_id' => $formattedArr]);
+
+
+        return view('dashboard.audit.level4', ['questions' => $questions]);
     }
+
+    public function level5(Audit $audit)
+    {
+        $passedProcessArr = $audit->passed_process;
+        $passedLevelProcess = $passedProcessArr[4];
+        foreach ($passedLevelProcess as $process){
+            $formattedProcess = ucwords(str_replace('_', ' ', $process));
+            $processId = RiskManagement::where('process_name', $formattedProcess)->pluck('id');
+            $formattedArr[] = $processId[0];
+        }
+
+        $questions = Question::where('level', 5)->whereIn('risk_management_id', $formattedArr)->get();
+
+
+        return view('dashboard.audit.level5', ['questions' => $questions, 'audit' => $audit, 'process_id' => $formattedArr]);
+    }
+
+    // public function passedProcess( $audit, object $process, int $limit , int $level)
+    // {
+    //     $currentPassedProcess = $audit->passed_process;
+    //     $baseProcess = [];
+    //     $passedProcess = [];
+    //     foreach ($process as $key=>$value){
+    //         if (empty($currentPassedProcess)){
+    //             $baseProcess[] = $key;
+    //         }
+    //         if ($value >= $limit){
+    //             $passedProcess[] = $key;
+    //         }
+    //     }
+
+    //     if (!empty($baseProcess)){
+    //         $currentPassedProcess[0] = $baseProcess;
+    //     }
+
+    //     $currentPassedProcess[$level] = $passedProcess;
+    //     $prevLevel = $level - 1;
+    //     $prevArr = $currentPassedProcess[$prevLevel];
+
+    //     foreach ($currentPassedProcess[$level] as $currItem) {
+    //         $key = array_search($currItem, $prevArr);
+    //         if ($currItem = $prevArr[$key]){
+    //             unset($prevArr[$key]);
+
+    //         }
+    //     }
+    //     $newArr = array_values($prevArr);
+    //     $currentPassedProcess[$prevLevel] = $newArr;
+
+    //     return $currentPassedProcess;
+    // }
+
+    // public function sortData(array $validatedData, object $audit, int $level)
+    // {
+    //     //Sorting Data
+    //     $sortedData = (object)[];
+    //     $processCategory = RiskManagement::all()->pluck('process_name');
+    //     foreach ($processCategory as $process) {
+    //         $formattedProcess = strtolower(str_replace(' ', '_', $process));
+    //         $sortedData->$formattedProcess = (object)[];
+    //     }
+    //     foreach ($validatedData as $key=>$value){
+    //         list($risk_management, $questionId) = explode('-', $key);
+
+    //         if(!isset($sortedData->$risk_management)){
+    //             $sortedData->$risk_management = (object)[];
+    //         }
+
+    //         if($value == 'false'){
+    //             FailedQuestion::create([
+    //                 'question_id' => $questionId,
+    //                 'audit_id' => $audit->id,
+    //                 'level' => $level,
+
+    //             ]);
+    //         }
+
+    //         $sortedData->$risk_management->$questionId = $value;
+    //     }
+    //     return $sortedData;
+    // }
+
+    // public function countRightAnswer(object $object )
+    // {
+    //     // dd(get_object_vars($object) != null);
+    //     if (get_object_vars($object) != null){
+    //         $toPercent = 100;
+    //         $rightAnswer = count(array_keys(get_object_vars($object), 'true')) ;
+    //         $totalQuestion = count(get_object_vars($object));
+
+    //         $result =  ($rightAnswer / $totalQuestion) * $toPercent;
+    //     } else {
+    //         $result = 0;
+    //     }
+    //     return $result;
+    // }
 
     public function output(Audit $audit)
     {
         if($audit->validated != true){
             $audit->level = $audit->level - 1;
         }
+
         $calculations = Calculation::where('audit_id', $audit->id)->get();
 
         foreach ($calculations as $calculation){
@@ -239,12 +338,13 @@ class AuditController extends Controller
             $array['Pemantauan Risiko'] = $calculation->pemantauan_risiko;
             $array['Evaluasi Risiko'] = $calculation->evaluasi_risiko;
 
-            $calculationArray[$calculation->level_id] = $array;
+            $calculationArray[$calculation->level] = $array;
         }
 
         $failedQuestions = FailedQuestion::where('audit_id', $audit->id)->get();
         $risk_managements = RiskManagement::all()->except(9);
         // $outputs = Audit::find($id);
+        // dd($audit->level);
         return view('dashboard.audit.output', [
             'audit' => $audit,
             'risk_managements' => $risk_managements,

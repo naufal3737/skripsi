@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('question');
             $table->string('recomendation');
+            $table->string('type')->nullable();
             $table->unsignedBigInteger('risk_management_id');
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('level_id');

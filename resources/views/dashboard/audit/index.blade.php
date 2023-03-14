@@ -57,7 +57,11 @@
                             <a class="btn btn-info text-info text-gradient px-3 mb-0"" href="{{route('dashboard.audit.output', $audit)}}"><i class="material-icons text-sm me-2">reviews</i>Lihat Hasil</a>
                         @else
                             @if ($audit->validated == 'true')
-                                <a class="btn btn-success text-success text-gradient px-3 mb-0"" href="{{route('dashboard.audit.level2')}}"><i class="material-icons text-sm me-2">check</i>Lanjut</a>
+                                @if ($audit->level < 5)
+                                <a class="btn btn-success text-success text-gradient px-3 mb-0"" href="{{route('dashboard.audit.level'.($audit->level + 1), $audit)}}"><i class="material-icons text-sm me-2">check</i>Lanjut</a>
+                                @else
+                                <a class="btn btn-success text-success text-gradient px-3 mb-0"" href="{{route('dashboard.audit.level'.($audit->level), $audit)}}"><i class="material-icons text-sm me-2">check</i>Lanjut</a>
+                                @endif
                             @else
                             <button class="btn btn-danger text-danger text-gradient px-3 mb-0" disabled><i class="material-icons text-sm me-2">close</i>Menunggu Validasi</button>
                             @endif

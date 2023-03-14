@@ -13,16 +13,18 @@ class Audit extends Model
         'progress',
         'user_id',
         'validated',
-        'passedProcess',
+        'passed_process',
         'files',
         'level',
+        'raw_data',
     ];
 
     protected $casts = [
         'validated' => 'boolean',
-        'passedProcess' => 'array',
+        'passed_process' => 'array',
         'files' => 'array',
         'level' => 'integer',
+        'raw_data' => 'object',
     ];
 
     public function user(){
@@ -31,5 +33,9 @@ class Audit extends Model
 
     public function failedQuestion(){
         return $this->hasMany(FailedQuestion::class);
+    }
+
+    public function calculation(){
+        return $this->hasMany(Calculation::class);
     }
 }

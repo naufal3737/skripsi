@@ -16,7 +16,7 @@
               </div>
             </div>
         </div>
-            <form role="form" action="{{route('dashboard.audit.level1.store')}}" method="POST" class="text-start" enctype="multipart/form-data" name="myForm">
+            <form role="form" action="{{route('dashboard.audit.level.store')}}" method="POST" class="text-start" enctype="multipart/form-data" name="myForm">
                 @csrf
                 @method('POST')
                 @foreach ($questions as $question)
@@ -87,29 +87,4 @@
         }
     }
 </script>
-{{-- <script>
-function listener() {
-  console.log('Previous:', prev ? prev.value : null);
-  prev = this;
-  console.log('Current:', this.value);
-}
-var prev, rad = document.forms.myForm.elements.myRadios;
-for(var i = 0; i < rad.length; i++) {
-  rad[i].addEventListener('click', listener);
-}
-</script> --}}
-{{-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
-<script type="text/javascript">
-    var i = 0;
-    $("#dynamic-ar").click(function () {
-        ++i;
-        $("#dynamicAddRemove").append('<tr><td><input type="file" name="filenames[' + i +
-            ']" class="form-control" /></td><td><button type="button" class="btn btn-outline-danger btn-danger remove-input-field">Hapus</button></td></tr>'
-            );
-    });
-    $(document).on('click', '.remove-input-field', function () {
-        $(this).parents('tr').remove();
-    });
-</script> --}}
 @endsection

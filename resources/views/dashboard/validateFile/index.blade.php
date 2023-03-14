@@ -41,13 +41,13 @@
                       </td>
                       <td class="text-center">
                         @if ($audit->validated == 'true')
-                        <form action="{{route('dashboard.validate.unvalidateFile',$audit)}}" method="POST">
+                        <form action="{{route('dashboard.unvalidate.audit',$audit)}}" method="POST">
                             @csrf
                             @method('POST')
                             <button class="btn btn-success text-success text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk menghapus validasi terhadap audit ini?')" {{$audit->progress == 'end' ? 'disabled' : ''}}><i class="material-icons text-sm me-2">check</i>{{$audit->progress == 'end' ? 'Audit telah selesai' : 'Tervalidasi'}}</button>
                         </form>
                         @else
-                        <form action="{{route('dashboard.validate.validateFile',$audit)}}" method="POST">
+                        <form action="{{route('dashboard.validate.audit',$audit)}}" method="POST">
                             @csrf
                             @method('POST')
                             <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk memvalidasi audit ini? \nPastikan bahwa audit ini sesuai dengan berkas yang telah diberikan.')" {{$audit->progress == 'end' ? 'disabled' : ''}}><i class="material-icons text-sm me-2">close</i>{{$audit->progress == 'end' ? 'Audit telah selesai' : 'Belum tervalidasi'}}</button>
