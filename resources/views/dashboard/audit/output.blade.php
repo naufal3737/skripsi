@@ -17,7 +17,7 @@
             <h6 class="text-capitalize ps-3 float-right text-center">Audit tidak lulus skala pengukuran level 0</h6>
             <div class="row">
                 <div class="col">
-                    <h6 class="text-capitalize ps-3 float-right text-center">Hasil Level 1</h6>
+                    <h6 class="text-capitalize ps-3 float-right text-center">Hasil Level 0</h6>
                     <div class="table-responsive p-0 border border-primary rounded mx-1">
                         <table class="table align-items-center mb-0">
                             <thead>
@@ -160,7 +160,7 @@
                     <ul class="list-group list-group-flush">
                         @foreach ($risk_managements as $category)
                         <h6 class="font-weight-bold mb-0 ">{{$category->process_name}}</h6>
-                            @foreach ($failedQuestions->whereIn('level', [2]) as $failedQuestion)
+                            @foreach ($failedQuestions->whereIn('level', [1]) as $failedQuestion)
                             @if ($category->process_name == $failedQuestion->question->risk_management->process_name)
                             <li class="list-group-item text-xs font-weight-bold mb-0 ">{{$failedQuestion->question->recomendation}}</li>
                             @endif

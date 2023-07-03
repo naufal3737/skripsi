@@ -34,7 +34,7 @@
                             <img src="https://cdn.pixabay.com/photo/2018/10/10/14/44/audit-3737447_960_720.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="audit1">
                           </div>
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Audit pada tanggal {{date('d-m-Y', strtotime($audit->created_at))}}</h6>
+                            <h6 class="mb-0 text-sm">Audit pada tanggal {{date('d-m-Y', strtotime($audit->created_at))}} oleh {{$audit->user->name}}</h6>
                             <p class="text-xs text-secondary mb-0">{{$audit->progress}}</p>
                           </div>
                         </div>
@@ -50,7 +50,7 @@
                         <form action="{{route('dashboard.validate.audit',$audit)}}" method="POST">
                             @csrf
                             @method('POST')
-                            <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk memvalidasi audit ini? \nPastikan bahwa audit ini sesuai dengan berkas yang telah diberikan.')" {{$audit->progress == 'end' ? 'disabled' : ''}}><i class="material-icons text-sm me-2">close</i>{{$audit->progress == 'end' ? 'Audit telah selesai' : 'Belum tervalidasi'}}</button>
+                            <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk memvalidasi audit ini?')" {{$audit->progress == 'end' ? 'disabled' : ''}}><i class="material-icons text-sm me-2">close</i>{{$audit->progress == 'end' ? 'Audit telah selesai' : 'Belum tervalidasi'}}</button>
                         </form>
                         @endif
                       </td>
@@ -58,10 +58,10 @@
                         @if ($audit->files)
                         <a class="btn btn-info text-info text-gradient" href="{{route('dashboard.validate.file', $audit)}}"><i class="material-icons text-sm me-2">description</i>Lihat Berkas</a>
                         @endif
-                            <form action="{{route('dashboard.audit.destroy',$audit)}}" method="POST">
+                            <form action="{{route('dashboard.validateFile.destroy',$audit->id)}}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk menghapus audit ini? \nAudit yang dihapus tidak akan dapat dikembalikan dan akan kehilangan semua progress.')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
+                                <button class="btn btn-danger text-danger text-gradient px-3 mb-0" onclick="return confirm('Apakah yakin untuk menghapus audit ini?')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
                             </form>
                       </td>
                     </tr>

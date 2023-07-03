@@ -18,7 +18,7 @@ class Calculation extends Model
         'mitigasi_risiko',
         'pemantauan_risiko',
         'evaluasi_risiko',
-        'level_id',
+        'level',
         'audit_id'
     ];
 }

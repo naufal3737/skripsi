@@ -58,7 +58,7 @@
                     {{-- @foreach ($files as $fileQuestionId => $file) --}}
 
                     <div class="row">
-                        <a class="col btn btn-info text-info text-gradient px-3 mb-3 mx-4" href="{{route('dashboard.validate.file.view', ['file' => $file, 'audit' => $audit])}}">Lihat Berkas</a>
+                        <a class="col btn btn-info text-info text-gradient px-3 mb-3 mx-4" href="{{route('dashboard.validate.file.view', ['file' => $file, 'audit' => $audit])}}" target="_blank">Lihat Berkas</a>
                         <div class="col"></div>
                         <div class="col"></div>
                         @if ($question->id == $fileQuestionId)

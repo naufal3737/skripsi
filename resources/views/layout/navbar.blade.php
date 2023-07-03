@@ -8,13 +8,13 @@
         <h6 class="font-weight-bolder mb-0">Dashboard</h6>
       </nav>
       <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-        <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+        <div class="ms-auto  pe-md-2 d-flex align-items-center">
         </div>
-        <ul class="navbar-nav  justify-content-end">
+        <ul class="navbar-nav  justify-content-end me-6">
           <li class="dropdown float-lg-end nav-item d-flex align-items-center">
             <a class="nav-link text-body font-weight-bold px-0 cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownTable">
-              <i class="fa fa-user me-sm-1"></i>
               <span class="d-sm-inline d-none">{{ Auth::user()->name }}</span>
+              <i class="fa fa-user me-sm-1"></i>
                 <div class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable"><a class="dropdown-item border-radius-md" href="{{ route('logout') }}"
                     onclick="event.preventDefault();
                                   document.getElementById('logout-form').submit();">Logout</a>

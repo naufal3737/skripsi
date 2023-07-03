@@ -6,12 +6,14 @@ use App\Models\Audit;
 use App\Models\Calculation;
 use App\Models\FailedQuestion;
 use App\Models\Question;
-use App\Traits\CalculateAndSort;
+use App\Traits\Calculate;
+use App\Traits\SortData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class ValidateFileController extends Controller
 {
-    use CalculateAndSort;
+    use Calculate, SortData;
 
     public function __construct()
     {
@@ -80,16 +82,16 @@ class ValidateFileController extends Controller
 
         //Sort data
         $level = $audit->level;
-
         $sortedData = $this->sortData($new_raw_data, $audit, $level);
-
+        // dd($this->countRightAnswer($sortedData->mitigasi_risiko));
+        
         //Update calculation
         $calculations->penetapan_konteks = $this->countRightAnswer($sortedData->penetapan_konteks);
         $calculations->identifikasi_risiko = $this->countRightAnswer($sortedData->identifikasi_risiko);
         $calculations->analisis_risiko = $this->countRightAnswer($sortedData->analisis_risiko);
         $calculations->perencanaan_manajemen_risiko = $this->countRightAnswer($sortedData->perencanaan_manajemen_risiko);
         $calculations->komunikasi_risiko = $this->countRightAnswer($sortedData->komunikasi_risiko);
-        $calculations->mitigasi_risiko > $this->countRightAnswer($sortedData->mitigasi_risiko);
+        $calculations->mitigasi_risiko = $this->countRightAnswer($sortedData->mitigasi_risiko);
         $calculations->pemantauan_risiko = $this->countRightAnswer($sortedData->pemantauan_risiko);
         $calculations->evaluasi_risiko = $this->countRightAnswer($sortedData->evaluasi_risiko);
         $calculations->save();
@@ -106,7 +108,7 @@ class ValidateFileController extends Controller
             $audit->progress = 'end';
         }
 
-        $passedProcess = $this->passedProcess($audit, $filteredProcess, $limit, $level);
+        $passedProcess = $this->sameLevelPassedProcess($audit, $filteredProcess, $limit, $level);
 
         if (empty($passedProcess[$level])){
             $audit->progress = 'end';
@@ -117,7 +119,7 @@ class ValidateFileController extends Controller
         $audit->save();
 
 
-        return redirect('/dashboard/validate-file')->with('success', 'Audit berhasil divalidasi');
+        return redirect()->back()->with('message', 'Audit berhasil divalidasi');
     }
 
     // public function unvalidateFile(Audit $audit)
@@ -154,7 +156,23 @@ class ValidateFileController extends Controller
 
         return view('dashboard.audit.file', ['audit' => $audit, 'questions' => $questions, 'failedQuestionsId' => $failedQuestionsId, 'files' => $files]);
     }
+    
+    public function destroy($id)
+    {
+        $audit = Audit::find($id);
+        if ($audit->files != null){
+            foreach ($audit->files as $file){
+                $path = 'files/'.$file;
+                File::delete($path);
+            }
+        }
+        $calculation = Calculation::where('audit_id', $id)->delete();
+        $failedQuestion = FailedQuestion::where('audit_id', $id)->delete();
+        $audit->delete();
 
+
+        return redirect('/dashboard/validate-file')->with('success', 'Audit berhasil dihapus!');
+    }
 
     public function viewFile($audit, $file)
     {

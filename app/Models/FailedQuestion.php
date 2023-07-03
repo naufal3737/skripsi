@@ -11,11 +11,19 @@ class FailedQuestion extends Model
 
     protected $fillable = [
         'question_id',
-        'level_id',
+        'level',
         'audit_id'
     ];
 
     public function question(){
         return $this->belongsTo(Question::class, 'question_id', 'id');
+    }
+
+    public function audit(){
+        return $this->belongsTo(Question::class, 'audit_id', 'id');
+    }
+
+    public function failedQuestion(){
+        return $this->hasMany(FailedQuestion::class);
     }
 }

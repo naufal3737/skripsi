@@ -29,7 +29,7 @@
                       <label class="form-label">{{$loop->iteration.'. '  .$question->question}}</label>
                         <div class="form-check">
                           <input class="form-check-input @error(strtolower($question->risk_management->process_name).'-'.$question->id) is-invalid @enderror" type="radio"
-                          name="{{strtolower($question->risk_management->process_name)}}-{{$question->id}}" id="{{'answerYes_'.$question->id}}" value="true" onchange="test2({{$question->id}})" checked>
+                          name="{{strtolower($question->risk_management->process_name)}}-{{$question->id}}" id="{{'answerYes_'.$question->id}}" value="true" onchange="test2({{$question->id}})">
                           <label class="form-check-label" for="answerYes">
                             Ya
                           </label>

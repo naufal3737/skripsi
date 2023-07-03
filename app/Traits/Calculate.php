@@ -5,7 +5,7 @@ namespace App\Traits;
 use App\Models\FailedQuestion;
 use App\Models\RiskManagement;
 
-trait CalculateAndSort
+trait Calculate
 {
     public function passedProcess( $audit, object $process, int $limit , int $level)
     {
@@ -55,35 +55,50 @@ trait CalculateAndSort
 
         return $currentPassedProcess;
     }
-
-    public function sortData($data, object $audit, int $level)
+    
+    public function sameLevelPassedProcess( $audit, object $process, int $limit , int $level)
     {
-        //Sorting Data
-        $sortedData = (object)[];
-        $processCategory = RiskManagement::all()->pluck('process_name');
-        foreach ($processCategory as $process) {
-            $formattedProcess = strtolower(str_replace(' ', '_', $process));
-            $sortedData->$formattedProcess = (object)[];
-        }
-        foreach ($data as $key=>$value){
-            list($risk_management, $questionId) = explode('-', $key);
+        //Current passed process from database
+        $currentPassedProcess = $audit->passed_process;
 
-            if(!isset($sortedData->$risk_management)){
-                $sortedData->$risk_management = (object)[];
+        //Previous array
+        $prevLevel = $level - 1;
+        $prevArr = $currentPassedProcess[$prevLevel];
+        
+        
+        $passedProcess = $currentPassedProcess[$level];
+
+        //Get the process name and put them in array
+        foreach ($process as $key=>$value){
+            if($value < $limit){
+                $arrKey = array_search($key, $passedProcess);
+                if(!empty($passedProcess)){
+                    if($key == $passedProcess[$arrKey]){
+                        unset($passedProcess[$arrKey]);
+                        array_push($prevArr, $key);
+                    }
+                }
+            } else {
+                $arrKey = array_search($key, $prevArr);
+                if(!empty($prevArr)){
+                    if($key == $prevArr[$arrKey]){
+                        unset($prevArr[$arrKey]);
+                        array_push($passedProcess, $key);
+                    }
+                }
             }
-
-            if($value == 'false'){
-                FailedQuestion::create([
-                    'question_id' => $questionId,
-                    'audit_id' => $audit->id,
-                    'level' => $level,
-
-                ]);
-            }
-
-            $sortedData->$risk_management->$questionId = $value;
         }
-        return $sortedData;
+
+        //Store back the changed array
+        $newPrevArr = array_values($prevArr);
+        $newPrevArrUnique = array_unique($newPrevArr);
+        $currentPassedProcess[$prevLevel] = $newPrevArrUnique;
+
+        $newCurrArr = array_values($passedProcess);
+        $newCurrArrUnique = array_unique($newCurrArr);
+        $currentPassedProcess[$level] = $newCurrArrUnique;
+
+        return $currentPassedProcess;
     }
 
     public function countRightAnswer(object $object )

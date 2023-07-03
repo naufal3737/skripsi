@@ -1,6 +1,6 @@
 @extends('layout.main')
 @section('container')
-<div class="container-fluid py-4">
+<div class="container-fluid">
 <div class="card my-4">
     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
           <div class="row bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
@@ -9,9 +9,8 @@
           </div>
     </div>
     <div class="card-body px-0 pb-2">
-        <div class="page-header min-vh-100">
-            <div class="container">
-                <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto">
+            <div class="container w-40 border border-radius-5px">
+                <div class="">
                   <div class="card card-plain">
                     <div class="card-header">
                       <h4 class="font-weight-bolder">Add New User</h4>
@@ -23,7 +22,7 @@
                         @method('POST')
                         <div class="input-group input-group-outline mb-3">
                           <label class="form-label">Name</label>
-                          <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name">
+                          <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" required>
                           @error('name')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -32,7 +31,7 @@
                         </div>
                         <div class="input-group input-group-outline mb-3">
                           <label class="form-label">Email</label>
-                          <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email">
+                          <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" required>
                           @error('email')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -41,29 +40,30 @@
                         </div>
                         <div class="input-group input-group-outline mb-3">
                           <label class="form-label">Password</label>
-                          <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password">
+                          <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" required>
                         @error('password')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
                         @enderror
                         </div>
+                        <!--<div class="input-group input-group-outline mb-3">-->
+                        <!--  <label class="form-label">Confirm Password</label>-->
+                        <!--  <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" name="password_confirmation" id="password_confirmation" required>-->
+                        <!--  @error('password_confirmation')-->
+                        <!--    <span class="invalid-feedback" role="alert">-->
+                        <!--        <strong>{{ $message }}</strong>-->
+                        <!--    </span>-->
+                        <!--@enderror-->
+                        <!--</div>-->
                         <div class="input-group input-group-outline mb-3">
-                          <label class="form-label">Confirm Password</label>
-                          <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" name="password_confirmation" id="password_confirmation">
-                          @error('password_confirmation')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                        </div>
-                        <div class="input-group input-group-outline mb-3">
-                            <select class="form-control @error('password_confirmation') is-invalid @enderror" name="role" id="role">
+                            <select class="form-control @error('role') is-invalid @enderror" name="role" id="role" required>
                                 <option selected>Select Role</option>
-                                <option value="user">User</option>
-                                <option value="auditor">Auditor</option>
+                                <option value="asesor">Asesor</option>
+                                <option value="auditee">Auditee</option>
+                                <option value="decision maker">Decision Maker</option>
                             </select>
-                            @error('password_confirmation')
+                            @error('role')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
@@ -83,7 +83,6 @@
                   </div>
                 </div>
             </div>
-        </div>
     </div>
   </div>
 </div>

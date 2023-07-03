@@ -26,8 +26,15 @@
     @yield('container')
     {{-- @include('layout.footer') --}}
   </main>
-@include('layout.floatingSetting')
+<!--@include('layout.floatingSetting')-->
   <!--   Core JS Files   -->
+//   <script>
+//     var scrollEventHandler = function()
+//     {
+//         window.scroll(0, window.pageXOffset)
+//     }
+//     window.addEventListener("scroll", scrollEventHandler, false);
+//   </script>
   <script src="{{asset('assets/js/core/popper.min.js')}}"></script>
   <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
   <script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>

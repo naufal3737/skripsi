@@ -7,7 +7,8 @@ use App\Models\Calculation;
 use App\Models\FailedQuestion;
 use App\Models\Question;
 use App\Models\RiskManagement;
-use App\Traits\CalculateAndSort;
+use App\Traits\Calculate;
+use App\Traits\SortData;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,24 +16,28 @@ use Illuminate\Support\Facades\File;
 
 class AuditController extends Controller
 {
-    use CalculateAndSort;
+    use Calculate, SortData;
 
     public function __construct()
     {
-        $this->middleware('can:use audit');
+        $this->middleware('permission:use audit')->except(['index', 'output']);
+        $this->middleware('permission:use audit|audit result')->only(['index', 'output']);
     }
 
     public function index()
     {
-        $audits = Audit::where('user_id',  Auth::user()->id)->paginate(10);
+        if ((Auth::user()->roles->pluck('name')[0]) == 'auditee'){
+            $audits = Audit::where('user_id',  Auth::user()->id)->paginate(10);
+        } else {
+            $audits = Audit::where('progress', 'end')->paginate(10);
+        }
         return view('dashboard.audit.index', ['audits'=> $audits]);
     }
 
     public function destroy($id)
     {
         $audit = Audit::find($id);
-        // dd($audit->files);
-        if ($audit->files){
+        if ($audit->files != null){
             foreach ($audit->files as $file){
                 $path = 'files/'.$file;
                 File::delete($path);
@@ -45,8 +50,6 @@ class AuditController extends Controller
 
         return redirect('/dashboard/audit')->with('success', 'Audit berhasil dihapus!');
     }
-
-
 
     public function level1()
     {
@@ -63,10 +66,10 @@ class AuditController extends Controller
         //Validation
 
         if(!$audit){
-            $questions = Question::where('level', '1')->where('id', '!=', '9')->get();
+            $questions = Question::where('level', '1')->get();
         } else {
             $questionLevel = $audit->level + 1;
-            $questions = Question::where('level', $questionLevel)->where('id', '!=', '9')->whereIn('risk_management_id', $request->questionIdArr)->get();
+            $questions = Question::where('level', $questionLevel)->whereIn('risk_management_id', $request->questionIdArr)->get();
         }
 
 
@@ -99,6 +102,8 @@ class AuditController extends Controller
 
         if ($audit->level == null){
             $level = 1;
+        } else {
+            $level = ++$audit->level;
         }
         // if($audit->level == null){
         //     $level = 1;
@@ -114,7 +119,13 @@ class AuditController extends Controller
         //Raw data insert
         $raw_data_object = (object)[];
         $raw_data_object->{'level_'.$level} = $validatedData;
-        $audit->raw_data = $raw_data_object;
+        if(!$audit->raw_data){
+            $audit->raw_data = $raw_data_object;
+        } else {
+            $newObj = $audit->raw_data;
+            $newObj->{'level_'.$level} = $validatedData;
+            $audit->raw_data = $newObj;
+        }
 
         //Store file
         $pathArr = [];
@@ -150,21 +161,22 @@ class AuditController extends Controller
         $filteredProcess = $processCollection->except(['level', 'audit_id', 'created_at', 'updated_at', 'id']);
 
         if($audit->level < 2){
-            $limit = 50;
+            $limit = 85;
         }elseif ($audit->level < 5) {
-            $limit = 100;
+            $limit = 85;
         }else {
-            $limit = 100;
+            $limit = 85;
             $audit->progress = 'end';
         }
 
         $passedProcess = $this->passedProcess($audit, $filteredProcess, $limit, $level);
 
+        $audit->level = $level;
         if (empty($passedProcess[$level])){
             $audit->progress = 'end';
+            --$audit->level;
         } else {
             $audit->progress = 'ongoing';
-            ++$audit->level ;
         }
         $audit->passed_process = $passedProcess;
         $audit->save();
@@ -322,9 +334,9 @@ class AuditController extends Controller
 
     public function output(Audit $audit)
     {
-        if($audit->validated != true){
-            $audit->level = $audit->level - 1;
-        }
+        // if($audit->validated != true){
+        //     $audit->level = $audit->level - 1;
+        // }
 
         $calculations = Calculation::where('audit_id', $audit->id)->get();
 
@@ -340,6 +352,7 @@ class AuditController extends Controller
 
             $calculationArray[$calculation->level] = $array;
         }
+        // dd($calculationArray);
 
         $failedQuestions = FailedQuestion::where('audit_id', $audit->id)->get();
         $risk_managements = RiskManagement::all()->except(9);

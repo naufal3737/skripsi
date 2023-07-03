@@ -9,7 +9,9 @@
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="row bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                   <h6 class="col text-white text-capitalize ps-3">Audit Table</h6>
+                  @can('use audit')
                   <a class="col-2 btn bg-gradient-dark mb-0 me-3" href="{{route('dashboard.audit.level1')}}"><i class="material-icons text-sm">add</i>&nbsp;&nbsp;Create New Audit</a>
+                  @endcan
                 </div>
           </div>
           <div class="card-body px-0 pb-2">
@@ -20,8 +22,15 @@
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">No</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-2">Audit</th>
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-3">Status</th>
+                    @can('use audit')
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Progress</th>
+                    @endcan
+                    @can('audit result')
                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Action</th>
+                    @endcan
+                    @can('use audit')
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-1 text-center">Action</th>
+                    @endcan
                   </tr>
                 </thead>
                 <tbody>
@@ -36,7 +45,12 @@
                             <img src="https://cdn.pixabay.com/photo/2018/10/10/14/44/audit-3737447_960_720.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="audit1">
                           </div>
                           <div class="d-flex flex-column justify-content-center">
+                            @can('audit result')
+                            <h6 class="mb-0 text-sm">Audit pada tanggal {{date('d-m-Y', strtotime($audit->created_at))}} oleh {{$audit->user->name}}</h6>
+                            @endcan
+                            @can('use audit')
                             <h6 class="mb-0 text-sm">Audit pada tanggal {{date('d-m-Y', strtotime($audit->created_at))}}</h6>
+                            @endcan
                             <p class="text-xs text-secondary mb-0">{{$audit->progress}}</p>
                           </div>
                         </div>
@@ -67,13 +81,15 @@
                             @endif
                         @endif
                       </td>
+                      @can('use audit')
                       <td class="text-center">
-                            <form action="{{route('dashboard.audit.destroy',$audit)}}" method="POST">
+                            <form action="{{route('dashboard.audit.destroy',$audit->id)}}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger text-danger text-gradient mb-0" onclick="return confirm('Apakah yakin untuk menghapus audit ini? \nAudit yang dihapus tidak akan dapat dikembalikan dan akan kehilangan semua progress.')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
+                                <button class="btn btn-danger text-danger text-gradient mb-0" onclick="return confirm('Apakah yakin untuk menghapus audit ini?')"><i class="material-icons text-sm me-2">delete</i>Delete</button>
                             </form>
                       </td>
+                      @endcan
                     </tr>
                     @endforeach
                 </tbody>

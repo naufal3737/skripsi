@@ -19,8 +19,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/dashboard');
 });
+
+Route::get('/home', function () {
+    return redirect('/dashboard');
+});
+
+
+// Route::get('/', [DashboardController::class, 'index']);
+// Route::get('/home', [DashboardController::class, 'index']);
 
 Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'], function(){
     Route::get('/', [DashboardController::class, 'index'])->name('home');
@@ -40,7 +48,7 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     Route::get('/audit/{audit}/level-4', [AuditController::class, 'level4'])->name('audit.level4');
     Route::get('/audit/{audit}/level-5', [AuditController::class, 'level5'])->name('audit.level5');
 
-    Route::delete('/audit/{audit}', [AuditController::class, 'destroy'])->name('audit.destroy');
+    Route::delete('/audit/{id}', [AuditController::class, 'destroy'])->name('audit.destroy');
     Route::get('/audit/output/{audit}', [AuditController::class, 'output'])->name('audit.output');
 
     Route::get('/user-management', [UserController::class, 'index'])->name('user.management');
@@ -56,5 +64,9 @@ Route::group(['prefix'=>'dashboard',  'middleware'=>'auth', 'as'=>'dashboard.'],
     Route::post('/validate-file/unvalidate-audit/{audit}', [ValidateFileController::class, 'unvalidateAudit'])->name('unvalidate.audit');
     Route::post('/validate-file/validate-file/{audit_id}/{question_id}', [ValidateFileController::class, 'validateFile'])->name('validate.validateFile');
     Route::post('/validate-file/unvalidate-file/{audit_id}/{question_id}', [ValidateFileController::class, 'unvalidateFile'])->name('validate.unvalidateFile');
+    Route::delete('/validate-file/{id}', [ValidateFileController::class, 'destroy'])->name('validateFile.destroy');
+    
+    Route::get('/audit-result', [AuditController::class, 'index'])->name('audit-result');
+    Route::get('/audit-result/output/{audit}', [AuditController::class, 'output'])->name('audit-result.output');
 });
 
